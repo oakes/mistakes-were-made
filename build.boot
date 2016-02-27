@@ -26,4 +26,4 @@
 
 (deftask build []
   (set-env! :source-paths #{"src"})
-  (comp (cljs :optimizations :simple)))
+  (comp (cljs :optimizations :advanced)))

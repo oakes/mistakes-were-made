@@ -11,7 +11,7 @@
   :plugins [[lein-cljsbuild "1.1.2"]]
   :cljsbuild {:builds {:main {:source-paths ["src"]
                               :compiler {:output-to "resources/public/mistakes-were-made.js"
-                                         :optimizations :simple
+                                         :optimizations :advanced
                                          :pretty-print false}
                               :jar true}}}
   :main mistakes-were-made.core)
