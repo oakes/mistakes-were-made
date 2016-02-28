@@ -11,7 +11,9 @@
   (let [s (subs text 0 position)
         last-newline (.lastIndexOf s \newline)
         row (count (re-seq #"\n" s))
-        col (- position last-newline)
+        col (if (>= last-newline 0)
+              (- position last-newline)
+              position)
         col (if (> row 0)
               (dec col) ; account for the last newline character
               col)]
