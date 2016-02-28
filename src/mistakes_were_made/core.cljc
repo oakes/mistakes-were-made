@@ -1,6 +1,5 @@
 (ns mistakes-were-made.core
-  (:require [clojure.data :refer [diff]]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [schema.core :refer [maybe either Any Str Int Keyword Bool]
              #?@(:clj [:as s])])
   #?(:cljs (:require-macros [schema.core :as s])))
@@ -24,12 +23,6 @@
         position (+ (count s) (inc col))]
     position))
 
-(s/defn count-lines-changed
-  "Returns the number of lines changed between the new lines and old lines."
-  [new-lines :- [Str]
-   old-lines :- [Str]]
-  (->> (diff new-lines old-lines) first (remove nil?) count))
-
 (s/defn create-edit-history []
   (atom {:current-state -1 :states []}))
 
@@ -39,13 +32,12 @@
    state :- {Keyword Any}]
   (let [{:keys [current-state states]} @edit-history
         old-state (get states current-state)
-        old-lines (:lines old-state)
-        new-lines (:lines state)
-        old-lines-changed (:lines-changed old-state)
-        new-lines-changed (count-lines-changed new-lines old-lines)
-        state (assoc state :lines-changed new-lines-changed)]
-    ; if the last two edits only affected one line, replace the last edit instead of adding a new edit
-    (when (not= old-lines-changed new-lines-changed 1)
+        old-cursor-position (or (:original-cursor-position old-state) 0)
+        new-cursor-position (:original-cursor-position state)
+        new-cursor-change (- new-cursor-position old-cursor-position)]
+    ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
+    (when (or (nil? old-state)
+              (not= new-cursor-change 1))
       (swap! edit-history update-in [:current-state] inc))
     (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
     (swap! edit-history update-in [:states] conj state)))
@@ -79,6 +71,7 @@
   ([text :- Str
     cursor-position :- Int]
    {:lines (custom-split-lines text)
+    :original-cursor-position cursor-position
     :cursor-position cursor-position}))
 
 (s/defn undo! :- (maybe {Keyword Any})
