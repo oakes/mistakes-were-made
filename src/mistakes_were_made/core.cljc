@@ -10,9 +10,12 @@
    position :- Int]
   (let [s (subs text 0 position)
         last-newline (.lastIndexOf s \newline)
+        row (count (re-seq #"\n" s))
         col (- position last-newline)
-        row (count (re-seq #"\n" s))]
-    [row (dec col)]))
+        col (if (> row 0)
+              (dec col) ; account for the last newline character
+              col)]
+    [row col]))
 
 (s/defn row-col->position :- Int
   "Converts a row and column number to an position."
@@ -20,8 +23,10 @@
    row :- Int
    col :- Int]
   (let [s (str/join \newline (take row (str/split text #"\n")))
-        position (+ (count s) (inc col))]
-    position))
+        position (+ (count s) col)]
+    (if (> row 0)
+      (inc position) ; account for the last newline character
+      position)))
 
 (s/defn create-edit-history []
   (atom {:current-state -1 :states []}))
@@ -36,7 +41,7 @@
         new-cursor-position (:original-cursor-position state)
         new-cursor-change (- new-cursor-position old-cursor-position)]
     ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
-    (when (or (nil? old-state)
+    (when (or (<= (count states) 1)
               (not= new-cursor-change 1))
       (swap! edit-history update-in [:current-state] inc))
     (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
