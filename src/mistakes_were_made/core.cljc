@@ -5,24 +5,24 @@
              #?@(:clj [:as s])])
   #?(:cljs (:require-macros [schema.core :as s])))
 
-(s/defn index->row-col :- [Int]
-  "Converts an index to a row and column number."
+(s/defn position->row-col :- [Int]
+  "Converts an position to a row and column number."
   [text :- Str
-   index :- Int]
-  (let [s (subs text 0 index)
+   position :- Int]
+  (let [s (subs text 0 position)
         last-newline (.lastIndexOf s \newline)
-        col (- index last-newline)
+        col (- position last-newline)
         row (count (re-seq #"\n" s))]
     [row (dec col)]))
 
-(s/defn row-col->index :- Int
-  "Converts a row and column number to an index."
+(s/defn row-col->position :- Int
+  "Converts a row and column number to an position."
   [text :- Str
    row :- Int
    col :- Int]
   (let [s (str/join \newline (take row (str/split text #"\n")))
-        index (+ (count s) (inc col))]
-    index))
+        position (+ (count s) (inc col))]
+    position))
 
 (s/defn count-lines-changed
   "Returns the number of lines changed between the new lines and old lines."
@@ -50,6 +50,14 @@
     (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
     (swap! edit-history update-in [:states] conj state)))
 
+(s/defn update-cursor-position!
+  "Updates only the cursor position."
+  [edit-history :- Any
+   cursor-position :- Int]
+  (let [{:keys [current-state]} @edit-history]
+    (when (>= current-state 0)
+      (swap! edit-history assoc-in [:states current-state :cursor-position] cursor-position))))
+
 (s/defn custom-split-lines :- [Str]
   "Splits the string into lines."
   [s :- Str]
@@ -67,11 +75,11 @@
   ([text :- Str
     cursor-line :- Int
     cursor-x :- Int]
-   (get-state text (row-col->index text cursor-line cursor-x)))
+   (get-state text (row-col->position text cursor-line cursor-x)))
   ([text :- Str
-    cursor-index :- Int]
+    cursor-position :- Int]
    {:lines (custom-split-lines text)
-    :index cursor-index}))
+    :cursor-position cursor-position}))
 
 (s/defn undo! :- (maybe {Keyword Any})
   "Returns the last state from edit-history, or nil if there is none."
