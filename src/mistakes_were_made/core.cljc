@@ -4,19 +4,21 @@
              #?@(:clj [:as s])])
   #?(:cljs (:require-macros [schema.core :as s])))
 
+(s/defn split-lines :- [Str]
+  "Splits the string into lines."
+  [s :- Str]
+  (seq (.split s "\n" -1)))
+
 (s/defn position->row-col :- [Int]
   "Converts an position to a row and column number."
   [text :- Str
    position :- Int]
-  (let [s (subs text 0 position)
-        last-newline (.lastIndexOf s \newline)
-        row (count (re-seq #"\n" s))
+  (let [text (subs text 0 position)
+        last-newline (.lastIndexOf text \newline)
+        row (count (re-seq #"\n" text))
         col (if (>= last-newline 0)
-              (- position last-newline)
-              position)
-        col (if (> row 0)
-              (dec col) ; account for the last newline character
-              col)]
+              (- position last-newline 1)
+              position)]
     [row col]))
 
 (s/defn row-col->position :- Int
@@ -24,11 +26,14 @@
   [text :- Str
    row :- Int
    col :- Int]
-  (let [s (str/join \newline (take row (str/split text #"\n")))
-        position (+ (count s) col)]
-    (if (> row 0)
-      (inc position) ; account for the last newline character
-      position)))
+  (let [all-lines (vec (split-lines text))
+        lines (vec (take row all-lines))
+        last-line (get all-lines row)
+        lines (if (and last-line (>= (count last-line) col))
+                (conj lines (subs last-line 0 col))
+                lines)
+        text (str/join \newline lines)]
+    (count text)))
 
 (s/defn create-edit-history []
   (atom {:current-state -1 :states []}))
@@ -57,18 +62,6 @@
     (when (>= current-state 0)
       (swap! edit-history assoc-in [:states current-state :cursor-position] cursor-position))))
 
-(s/defn custom-split-lines :- [Str]
-  "Splits the string into lines."
-  [s :- Str]
-  (let [s (if-not (= \newline (last s))
-            (str s "\n ")
-            (str s " "))
-        lines (str/split-lines s)
-        last-line (last lines)
-        last-line-len (max 0 (dec (count last-line)))]
-    (conj (vec (butlast lines))
-          (subs last-line 0 last-line-len))))
-
 (s/defn get-state :- {Keyword Any}
   "Returns the updated state of the text editor."
   ([text :- Str
@@ -77,7 +70,7 @@
    (get-state text (row-col->position text cursor-line cursor-x)))
   ([text :- Str
     cursor-position :- Int]
-   {:lines (custom-split-lines text)
+   {:lines (split-lines text)
     :original-cursor-position cursor-position
     :cursor-position cursor-position}))
 
