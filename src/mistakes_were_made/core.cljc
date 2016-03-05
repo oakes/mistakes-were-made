@@ -14,7 +14,7 @@
   [text :- Str
    position :- Int]
   (let [text (subs text 0 position)
-        last-newline (.lastIndexOf text \newline)
+        last-newline (.lastIndexOf text (str \newline))
         row (count (re-seq #"\n" text))
         col (if (>= last-newline 0)
               (- position last-newline 1)
