@@ -10,7 +10,7 @@
   (seq (.split s "\n" -1)))
 
 (s/defn position->row-col :- [Int]
-  "Converts an position to a row and column number."
+  "Converts a position to a row and column number."
   [text :- Str
    position :- Int]
   (let [text (subs text 0 position)
@@ -22,7 +22,7 @@
     [row col]))
 
 (s/defn row-col->position :- Int
-  "Converts a row and column number to an position."
+  "Converts a row and column number to a position."
   [text :- Str
    row :- Int
    col :- Int]
