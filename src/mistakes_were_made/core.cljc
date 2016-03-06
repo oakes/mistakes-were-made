@@ -103,5 +103,3 @@
   (if-let [{:keys [current-state states]} @edit-history]
     (some? (get states (inc current-state)))
     false))
-
-(s/defn init-debug! [])

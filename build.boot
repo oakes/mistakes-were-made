@@ -20,7 +20,7 @@
   (set-env! :source-paths #{"src" "test"})
   (comp (serve :dir "target/public")
         (watch)
-        (reload :on-jsload 'mistakes-were-made.core/init-debug!)
+        (reload)
         (cljs-repl)
         (cljs :source-map true :optimizations :none)))
 
