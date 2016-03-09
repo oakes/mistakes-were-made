@@ -44,8 +44,8 @@
    state :- {Keyword Any}]
   (let [{:keys [current-state states]} @edit-history
         old-state (get states current-state)
-        old-cursor-position (or (:original-cursor-position old-state) 0)
-        new-cursor-position (:original-cursor-position state)
+        old-cursor-position (or (first (:original-cursor-position old-state)) 0)
+        new-cursor-position (first (:original-cursor-position state))
         new-cursor-change (- new-cursor-position old-cursor-position)]
     ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
     (when (or (<= (count states) 1)
@@ -57,7 +57,7 @@
 (s/defn update-cursor-position!
   "Updates only the cursor position."
   [edit-history :- Any
-   cursor-position :- Int]
+   cursor-position :- [Int]]
   (let [{:keys [current-state]} @edit-history]
     (when (>= current-state 0)
       (swap! edit-history assoc-in [:states current-state :cursor-position] cursor-position))))
@@ -67,9 +67,10 @@
   ([text :- Str
     cursor-line :- Int
     cursor-x :- Int]
-   (get-state text (row-col->position text cursor-line cursor-x)))
+   (let [pos (row-col->position text cursor-line cursor-x)]
+     (get-state text [pos pos])))
   ([text :- Str
-    cursor-position :- Int]
+    cursor-position :- [Int]]
    {:lines (split-lines text)
     :original-cursor-position cursor-position
     :cursor-position cursor-position}))
