@@ -47,12 +47,13 @@
         old-cursor-position (or (first (:original-cursor-position old-state)) 0)
         new-cursor-position (first (:original-cursor-position state))
         new-cursor-change (- new-cursor-position old-cursor-position)]
-    ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
-    (when (or (<= (count states) 1)
-              (not= new-cursor-change 1))
-      (swap! edit-history update-in [:current-state] inc))
-    (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
-    (swap! edit-history update-in [:states] conj state)))
+    (when-not (= (:lines old-state) (:lines state))
+      ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
+      (when (or (<= current-state 1)
+                (not= new-cursor-change 1))
+        (swap! edit-history update-in [:current-state] inc))
+      (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
+      (swap! edit-history update-in [:states] conj state))))
 
 (s/defn update-cursor-position!
   "Updates only the cursor position."
@@ -79,9 +80,9 @@
   "Returns the last state from edit-history, or nil if there is none."
   [edit-history :- Any]
   (let [{:keys [current-state states]} @edit-history]
-     (when-let [state (get states (dec current-state))]
-       (swap! edit-history update-in [:current-state] dec)
-       state)))
+    (when-let [state (get states (dec current-state))]
+      (swap! edit-history update-in [:current-state] dec)
+      state)))
 
 (s/defn redo! :- (maybe {Keyword Any})
   "Returns the next state from edit-history, or nil if there is none."
