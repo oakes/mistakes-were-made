@@ -7,7 +7,7 @@
 (s/defn split-lines :- [Str]
   "Splits the string into lines."
   [s :- Str]
-  (vec (.split s "\n" -1)))
+  (vec (.split s "\r?\n" -1)))
 
 (s/defn position->row-col :- [Int]
   "Converts a position to a row and column number."
