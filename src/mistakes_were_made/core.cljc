@@ -7,14 +7,14 @@
 (s/defn split-lines :- [Str]
   "Splits the string into lines."
   [s :- Str]
-  (vec (.split s #?(:clj "\r?\n" :cljs "\n") -1)))
+  (vec (.split s "\n" -1)))
 
 (s/defn position->row-col :- [Int]
   "Converts a position to a row and column number."
   [text :- Str
    position :- Int]
   (let [text (subs text 0 position)
-        last-newline (.lastIndexOf text (str \newline))
+        last-newline (.lastIndexOf text "\n")
         row (count (re-seq #"\n" text))
         col (if (>= last-newline 0)
               (- position last-newline 1)
@@ -32,7 +32,7 @@
         lines (if (and last-line (>= (count last-line) col))
                 (conj lines (subs last-line 0 col))
                 lines)
-        text (str/join \newline lines)]
+        text (str/join "\n" lines)]
     (count text)))
 
 (s/defn create-edit-history []
