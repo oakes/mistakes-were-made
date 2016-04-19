@@ -76,32 +76,44 @@
     :original-cursor-position cursor-position
     :cursor-position cursor-position}))
 
-(s/defn undo! :- (maybe {Keyword Any})
-  "Returns the last state from edit-history, or nil if there is none."
+(s/defn get-current-state :- (maybe {Keyword Any})
+  "Returns the current state from edit-history, or nil if there is none."
   [edit-history :- Any]
   (let [{:keys [current-state states]} @edit-history]
-    (when-let [state (get states (dec current-state))]
-      (swap! edit-history update-in [:current-state] dec)
-      state)))
+    (get states current-state)))
 
-(s/defn redo! :- (maybe {Keyword Any})
+(s/defn get-previous-state :- (maybe {Keyword Any})
+  "Returns the previous state from edit-history, or nil if there is none."
+  [edit-history :- Any]
+  (let [{:keys [current-state states]} @edit-history]
+    (get states (dec current-state))))
+
+(s/defn get-next-state :- (maybe {Keyword Any})
   "Returns the next state from edit-history, or nil if there is none."
   [edit-history :- Any]
   (let [{:keys [current-state states]} @edit-history]
-    (when-let [state (get states (inc current-state))]
-      (swap! edit-history update-in [:current-state] inc)
-      state)))
+    (get states (inc current-state))))
+
+(s/defn undo! :- (maybe {Keyword Any})
+  "Changes the current state and returns the previous state from edit-history, or nil if there is none."
+  [edit-history :- Any]
+  (when-let [state (get-previous-state edit-history)]
+    (swap! edit-history update :current-state dec)
+    state))
+
+(s/defn redo! :- (maybe {Keyword Any})
+  "Changes the current state and returns the next state from edit-history, or nil if there is none."
+  [edit-history :- Any]
+  (when-let [state (get-next-state edit-history)]
+    (swap! edit-history update :current-state inc)
+    state))
 
 (s/defn can-undo? :- Bool
   "Returns true if we can undo."
   [edit-history :- Any]
-  (if-let [{:keys [current-state states]} @edit-history]
-    (some? (get states (dec current-state)))
-    false))
+  (some? (get-previous-state edit-history)))
 
 (s/defn can-redo? :- Bool
   "Returns true if we can redo."
   [edit-history :- Any]
-  (if-let [{:keys [current-state states]} @edit-history]
-    (some? (get states (inc current-state)))
-    false))
+  (some? (get-next-state edit-history)))
