@@ -1,3 +1,5 @@
+[![Clojars Project](https://img.shields.io/clojars/v/mistakes-were-made.svg)](https://clojars.org/mistakes-were-made)
+
 ## Introduction
 
 An undo/redo system for Clojure and ClojureScript.
