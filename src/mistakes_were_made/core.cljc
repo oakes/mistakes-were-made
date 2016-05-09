@@ -13,9 +13,10 @@
    state :- {Keyword Any}]
   (let [{:keys [current-state states]} @edit-history
         old-state (get states current-state)
-        old-cursor-position (or (first (:cursor-position old-state)) 0)
+        old-cursor-position (or (first (:original-cursor-position old-state)) 0)
         new-cursor-position (first (:cursor-position state))
-        new-cursor-change (- new-cursor-position old-cursor-position)]
+        new-cursor-change (- new-cursor-position old-cursor-position)
+        state (assoc state :original-cursor-position (:cursor-position state))]
     (when-not (= (:text old-state) (:text state))
       ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
       (when (or (<= current-state 1)
