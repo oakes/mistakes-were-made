@@ -21,9 +21,9 @@
       ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
       (when (or (<= current-state 1)
                 (not= new-cursor-change 1))
-        (swap! edit-history update-in [:current-state] inc))
-      (swap! edit-history update-in [:states] subvec 0 (:current-state @edit-history))
-      (swap! edit-history update-in [:states] conj state))))
+        (swap! edit-history update :current-state inc))
+      (swap! edit-history update :states subvec 0 (:current-state @edit-history))
+      (swap! edit-history update :states conj state))))
 
 (s/defn update-cursor-position!
   "Updates only the cursor position."
