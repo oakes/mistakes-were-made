@@ -1,4 +1,4 @@
-(defproject mistakes-were-made "1.6.2-SNAPSHOT"
+(defproject mistakes-were-made "1.6.2"
   :description "An undo/redo system for Clojure and ClojureScript"
   :url "https://github.com/oakes/mistakes-were-made"
   :license {:name "Public Domain"
