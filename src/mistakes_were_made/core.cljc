@@ -23,7 +23,13 @@
                 (not= new-cursor-change 1))
         (swap! edit-history update :current-state inc))
       (swap! edit-history update :states subvec 0 (:current-state @edit-history))
-      (swap! edit-history update :states conj state))))
+      (swap! edit-history update :states conj state)
+      (swap! edit-history (fn [{:keys [current-state states limit] :as history}]
+                            (if (and limit (> (count states) limit))
+                              (assoc history
+                                :current-state (dec current-state)
+                                :states (subvec states 1))
+                              history))))))
 
 (s/defn update-cursor-position!
   "Updates only the cursor position."
