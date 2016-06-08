@@ -13,5 +13,4 @@
   (repl :init-ns 'mistakes-were-made.core))
 
 (deftask build []
-  (set-env! :source-paths #{"src"})
   (comp (cljs :optimizations :advanced) (target)))
