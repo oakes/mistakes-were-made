@@ -11,25 +11,27 @@
   "Updates the edit history atom."
   [edit-history :- Any
    state :- {Keyword Any}]
-  (let [{:keys [current-state states]} @edit-history
+  (let [{:keys [current-state states limit]} @edit-history
         old-state (get states current-state)
         old-cursor-position (or (first (:original-cursor-position old-state)) 0)
         new-cursor-position (first (:cursor-position state))
         new-cursor-change (- new-cursor-position old-cursor-position)
         state (assoc state :original-cursor-position (:cursor-position state))]
     (when-not (= (:text old-state) (:text state))
-      ; if the last edit wasn't a single character after the previous edit, make it a separate undoable edit
-      (when (or (<= current-state 1)
-                (not= new-cursor-change 1))
-        (swap! edit-history update :current-state inc))
-      (swap! edit-history update :states subvec 0 (:current-state @edit-history))
-      (swap! edit-history update :states conj state)
-      (swap! edit-history (fn [{:keys [current-state states limit] :as history}]
-                            (if (and limit (> (count states) limit))
-                              (assoc history
-                                :current-state (dec current-state)
-                                :states (subvec states 1))
-                              history))))))
+      (swap! edit-history
+        (fn [edit-history-map]
+          (let [new-current-state (if (or (<= current-state 1) (not= new-cursor-change 1))
+                                    (inc current-state)
+                                    current-state)
+                new-states (subvec states 0 new-current-state)
+                new-states (conj new-states state)]
+            (if (and limit (> (count new-states) limit))
+              (assoc edit-history-map
+                :current-state (dec new-current-state)
+                :states (subvec new-states 1))
+              (assoc edit-history-map
+                :current-state new-current-state
+                :states new-states))))))))
 
 (s/defn update-cursor-position!
   "Updates only the cursor position."
