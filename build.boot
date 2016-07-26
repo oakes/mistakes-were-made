@@ -1,16 +1,27 @@
 (set-env!
   :source-paths #{"src"}
-  :dependencies '[[adzerk/boot-cljs "1.7.228-1" :scope "test"]
-                  ; project deps
-                  [org.clojure/clojure "1.8.0"]
+  :dependencies '[[org.clojure/clojure "1.8.0"]
                   [org.clojure/clojurescript "1.8.51"]
-                  [prismatic/schema "0.4.3"]])
+                  [prismatic/schema "0.4.3"]]
+  :repositories (conj (get-env :repositories)
+                  ["clojars" {:url "https://clojars.org/repo/"
+                              :username (System/getenv "CLOJARS_USER")
+                              :password (System/getenv "CLOJARS_PASS")}]))
 
-(require
-  '[adzerk.boot-cljs :refer [cljs]])
+(task-options!
+  pom {:project 'mistakes-were-made
+       :version "1.6.5-SNAPSHOT"
+       :description "An undo/redo system for Clojure and ClojureScript"
+       :url "https://github.com/oakes/mistakes-were-made"
+       :license {"Public Domain" "http://unlicense.org/UNLICENSE"}}
+  push {:repo "clojars"})
 
 (deftask run-repl []
   (repl :init-ns 'mistakes-were-made.core))
 
-(deftask build []
-  (comp (cljs :optimizations :advanced) (target)))
+(deftask try []
+  (comp (pom) (jar) (install)))
+
+(deftask deploy []
+  (comp (pom) (jar) (push)))
+
