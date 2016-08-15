@@ -1,3 +1,0 @@
-{:require  [mistakes-were-made.core]
- :init-fns []
- :compiler-options {}}
