@@ -16,9 +16,6 @@
        :license {"Public Domain" "http://unlicense.org/UNLICENSE"}}
   push {:repo "clojars"})
 
-(deftask run-repl []
-  (repl :init-ns 'mistakes-were-made.core))
-
 (deftask try []
   (comp (pom) (jar) (install)))
 
