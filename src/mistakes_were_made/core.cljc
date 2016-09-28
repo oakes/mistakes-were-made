@@ -1,7 +1,6 @@
 (ns mistakes-were-made.core
   (:require [clojure.string :as str]
-            [clojure.spec :as s :refer [fdef]]
-            [clojure.spec.test :refer [instrument]]))
+            [clojure.spec :as s :refer [fdef]]))
 
 (defn create-edit-history []
   (atom {:current-state -1 :states []}))
