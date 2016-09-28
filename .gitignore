@@ -4,6 +4,5 @@ pom.xml
 pom.xml.asc
 **/gen
 **/target
-*~
 .*
-resources/public/mistakes-were-made.js
+!.gitignore
