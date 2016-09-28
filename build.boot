@@ -16,7 +16,7 @@
        :license {"Public Domain" "http://unlicense.org/UNLICENSE"}}
   push {:repo "clojars"})
 
-(deftask try []
+(deftask local []
   (comp (pom) (jar) (install)))
 
 (deftask deploy []
