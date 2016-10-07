@@ -1,6 +1,5 @@
 (ns mistakes-were-made.core
-  (:require [clojure.string :as str]
-            [clojure.spec :as s :refer [fdef]]))
+  (:require [clojure.string :as str]))
 
 (defn create-edit-history []
   (atom {:current-state -1 :states []}))
@@ -78,56 +77,4 @@
   "Returns true if we can redo."
   [edit-history]
   (some? (get-next-state edit-history)))
-
-; specs
-
-(def atom? any?) ; TODO
-
-(s/def ::text string?)
-(s/def ::cursor-position (s/tuple integer? integer?))
-(s/def ::original-cursor-position ::cursor-position)
-(s/def ::state (s/keys :req-un [::cursor-position ::text] :opt-un [::original-cursor-position]))
-(s/def ::states (s/coll-of ::staate))
-(s/def ::current-state integer?)
-(s/def ::history (s/keys :req-un [::current-state ::states]))
-
-(fdef create-edit-history
-  :args (s/cat)
-  :ret ::history)
-
-(fdef update-edit-history!
-  :args (s/cat :edit-history atom? :state ::state)
-  :ret (s/nilable ::history))
-
-(fdef update-cursor-position!
-  :args (s/cat :edit-history atom? :cursor-position ::cursor-position)
-  :ret (s/nilable ::history))
-
-(fdef get-current-state
-  :args (s/cat :edit-history atom?)
-  :ret (s/nilable ::state))
-
-(fdef get-previous-state
-  :args (s/cat :edit-history atom?)
-  :ret (s/nilable ::state))
-
-(fdef get-next-state
-  :args (s/cat :edit-history atom?)
-  :ret (s/nilable ::state))
-
-(fdef undo!
-  :args (s/cat :edit-history atom?)
-  :ret (s/nilable ::history))
-
-(fdef redo!
-  :args (s/cat :edit-history atom?)
-  :ret (s/nilable ::history))
-
-(fdef can-undo?
-  :args (s/cat :edit-history atom?)
-  :ret boolean?)
-
-(fdef can-redo?
-  :args (s/cat :edit-history atom?)
-  :ret boolean?)
 
