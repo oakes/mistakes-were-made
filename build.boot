@@ -2,7 +2,7 @@
   :source-paths #{"src"}
   :resource-paths #{"src"}
   :dependencies '[[org.clojure/clojure "1.8.0"]
-                  [org.clojure/clojurescript "1.9.225"]]
+                  [org.clojure/clojurescript "1.9.225" :scope "provided"]]
   :repositories (conj (get-env :repositories)
                   ["clojars" {:url "https://clojars.org/repo/"
                               :username (System/getenv "CLOJARS_USER")
@@ -10,7 +10,7 @@
 
 (task-options!
   pom {:project 'mistakes-were-made
-       :version "1.6.6-SNAPSHOT"
+       :version "1.6.6"
        :description "An undo/redo system for Clojure and ClojureScript"
        :url "https://github.com/oakes/mistakes-were-made"
        :license {"Public Domain" "http://unlicense.org/UNLICENSE"}}
