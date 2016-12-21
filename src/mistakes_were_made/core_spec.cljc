@@ -2,7 +2,7 @@
   (:require [mistakes-were-made.core :as c]
             [clojure.spec :as s :refer [fdef]]))
 
-(def atom? any?) ; TODO
+(def atom? #(instance? #?(:clj clojure.lang.Atom :cljs cljs.core/Atom) %))
 
 (s/def ::text string?)
 (s/def ::cursor-position (s/tuple integer? integer?))
