@@ -8,7 +8,7 @@ An undo/redo system for Clojure and ClojureScript.
 
 You can include this library in your project dependencies using the version number in the badge above.
 
-To experiment with this library in a REPL, you can use [the Clojure CLI tool](https://clojure.org/guides/getting_started#_clojure_installer_and_cli_tools). In this directory, run `clj` to start a Clojure REPL, or `clj -m cljs.repl.node` to start a ClojureScript REPL. When the REPL is up, enter the main namespace with `(doto 'mistakes-were-made.core require in-ns)`.
+To experiment with this library in a REPL, you can use [the Clojure CLI tool](https://clojure.org/guides/getting_started#_clojure_installer_and_cli_tools). In this directory, run `clj` to start a Clojure REPL, or `clj -m cljs.repl.node` to start a ClojureScript REPL. When the REPL is up, enter the main namespace with `(require 'mistakes-were-made.core) (in-ns 'mistakes-were-made.core)`.
 
 ## Licensing
 
