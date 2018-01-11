@@ -8,13 +8,13 @@
 (s/def ::cursor-position (s/tuple integer? integer?))
 (s/def ::original-cursor-position ::cursor-position)
 (s/def ::state (s/keys :req-un [::cursor-position ::text] :opt-un [::original-cursor-position]))
-(s/def ::states (s/coll-of ::staate))
+(s/def ::states (s/coll-of ::state))
 (s/def ::current-state integer?)
 (s/def ::history (s/keys :req-un [::current-state ::states]))
 
 (fdef create-edit-history
   :args (s/cat)
-  :ret ::history)
+  :ret atom?)
 
 (defn create-edit-history []
   (atom {:current-state -1 :states []}))
@@ -91,7 +91,7 @@
 
 (fdef undo!
   :args (s/cat :*edit-history atom?)
-  :ret (s/nilable ::history))
+  :ret (s/nilable ::state))
 
 (defn undo!
   "Changes the current state and returns the previous state from edit-history, or nil if there is none."
@@ -102,7 +102,7 @@
 
 (fdef redo!
   :args (s/cat :*edit-history atom?)
-  :ret (s/nilable ::history))
+  :ret (s/nilable ::state))
 
 (defn redo!
   "Changes the current state and returns the next state from edit-history, or nil if there is none."
