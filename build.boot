@@ -9,7 +9,7 @@
 
 (task-options!
   pom {:project 'mistakes-were-made
-       :version "1.7.5"
+       :version "1.7.6-SNAPSHOT"
        :description "An undo/redo system for Clojure and ClojureScript"
        :url "https://github.com/oakes/mistakes-were-made"
        :license {"Public Domain" "http://unlicense.org/UNLICENSE"}
