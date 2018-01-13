@@ -7,7 +7,10 @@
 (s/def ::text string?)
 (s/def ::cursor-position (s/tuple integer? integer?))
 (s/def ::original-cursor-position ::cursor-position)
-(s/def ::state (s/keys :req-un [::cursor-position ::text] :opt-un [::original-cursor-position]))
+(s/def ::selection-change? boolean?)
+(s/def ::state (s/keys
+                 :req-un [::cursor-position ::text]
+                 :opt-un [::original-cursor-position ::selection-change?]))
 (s/def ::states (s/coll-of ::state))
 (s/def ::current-state integer?)
 (s/def ::history (s/keys :req-un [::current-state ::states]))
@@ -32,7 +35,8 @@
         new-cursor-position (first (:cursor-position state))
         new-cursor-change (- new-cursor-position old-cursor-position)
         state (assoc state :original-cursor-position (:cursor-position state))]
-    (when-not (= (:text old-state) (:text state))
+    (when (or (not= (:text old-state) (:text state))
+              (:selection-change? state))
       (swap! *edit-history
         (fn [edit-history]
           (let [new-current-state (if (or (<= current-state 1) (not= new-cursor-change 1))
